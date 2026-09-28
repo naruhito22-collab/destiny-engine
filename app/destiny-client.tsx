@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { getSupabaseBrowserClient } from '@/lib/browser/supabase';
 
 type DailyRow={id:string;data:any};
@@ -27,8 +28,8 @@ export default function DestinyClient(){
 
   useEffect(()=>{
     const supabase=getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({data})=>setLoggedIn(Boolean(data.session)));
-    const {data}=supabase.auth.onAuthStateChange((_event,session)=>setLoggedIn(Boolean(session)));
+    supabase.auth.getSession().then(({data}:{data:{session:Session|null}})=>setLoggedIn(Boolean(data.session)));
+    const {data}=supabase.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setLoggedIn(Boolean(session)));
     return ()=>data.subscription.unsubscribe();
   },[]);
 
