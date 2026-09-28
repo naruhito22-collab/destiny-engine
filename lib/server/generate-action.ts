@@ -16,6 +16,7 @@ export type GenerateActionInput={
   directionModifier?:string|null;
   timeModifier?:string|null;
   pattern:ActionPattern;
+  selectedAxes?:string[];
   recentActions?:string[];
 };
 
@@ -54,6 +55,7 @@ export async function generateActionWithOpenAI(input:GenerateActionInput){
       name:input.pattern.patternName,
       definition:input.pattern.patternDefinition,
     },
+    selected_axes:input.selectedAxes??[],
     recent_actions:(input.recentActions??[]).slice(0,14),
   };
 
