@@ -15,3 +15,11 @@ test('tarot and iching are deterministic',()=>{
   assert.deepEqual(drawTarot(s),drawTarot(s));
   assert.deepEqual(drawIChing(s),drawIChing(s));
 });
+
+test('I Ching resulting hexagram flips the selected line', async () => {
+  const { resultingHexagramId } = await import('./iching');
+  assert.equal(resultingHexagramId(1,1),44);
+  assert.equal(resultingHexagramId(1,2),13);
+  assert.equal(resultingHexagramId(1,6),43);
+  assert.equal(resultingHexagramId(2,1),24);
+});
