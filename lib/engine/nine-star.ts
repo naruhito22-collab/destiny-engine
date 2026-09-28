@@ -134,3 +134,114 @@ export function calculateDirectionSignal(args:{
     calculationVersion:'nine_star_direction_v1',
   };
 }
+
+
+export type SolsticeKind='WINTER'|'SUMMER';
+
+export type NineStarTransition={
+  kind:SolsticeKind;
+  solsticeDate:string;
+  transitionDate:string;
+  mode:DunMode;
+  startStar:NineStar;
+};
+
+function isoDate(date:Date){
+  return date.toISOString().slice(0,10);
+}
+
+function addDays(localDate:string,days:number){
+  const d=parseDate(localDate);
+  d.setUTCDate(d.getUTCDate()+days);
+  return isoDate(d);
+}
+
+/**
+ * DESTINY ENGINE day-nine-star v1 transition rule.
+ * Adopted rule: Koyomi-no-page method.
+ * If the solstice sexagenary index is 0..29, use the previous Jia-Zi day.
+ * If it is 30..59, use the following Jia-Zi day.
+ */
+export function calculateTransitionFromSolstice(
+  solsticeDate:string,
+  kind:SolsticeKind,
+):NineStarTransition{
+  const idx=sexagenaryDayIndex(solsticeDate);
+  const transitionDate=idx<=29
+    ? addDays(solsticeDate,-idx)
+    : addDays(solsticeDate,60-idx);
+
+  return {
+    kind,
+    solsticeDate,
+    transitionDate,
+    mode:kind==='WINTER'?'YANG':'YIN',
+    startStar:kind==='WINTER'?1:9,
+  };
+}
+
+export function transitionIntervalDays(
+  a:NineStarTransition,
+  b:NineStarTransition,
+){
+  return dayDiff(a.transitionDate,b.transitionDate);
+}
+
+export function calculateDayStarFromTransitionPair(
+  localDate:string,
+  current:NineStarTransition,
+  next:NineStarTransition,
+){
+  const offset=dayDiff(current.transitionDate,localDate);
+  const interval=transitionIntervalDays(current,next);
+
+  if(offset<0||offset>=interval){
+    throw new Error('localDate must fall within the supplied transition pair');
+  }
+  if(interval!==180&&interval!==240){
+    throw new Error(`unsupported transition interval: ${interval}`);
+  }
+
+  const step=current.mode==='YANG'?1:-1;
+
+  if(interval===180||offset<210){
+    return {
+      star:wrapStar(current.startStar+step*offset),
+      mode:current.mode,
+      leapPhase:interval===240&&offset>=180?'LEAP_FIRST_HALF':null,
+      transitionIntervalDays:interval,
+      calculationVersion:'nine_star_day_v1_koyomi',
+    } as const;
+  }
+
+  // In a 240-day interval, the latter 60 days are the leap period.
+  // Days 180..209 continue the previous mode.
+  // Day 210 repeats the same star as day 209, then reverses direction.
+  const repeatedStar=wrapStar(current.startStar+step*209);
+  const reversedMode:DunMode=current.mode==='YANG'?'YIN':'YANG';
+  const reversedStep=reversedMode==='YANG'?1:-1;
+
+  return {
+    star:wrapStar(repeatedStar+reversedStep*(offset-210)),
+    mode:reversedMode,
+    leapPhase:'LEAP_SECOND_HALF',
+    transitionIntervalDays:interval,
+    calculationVersion:'nine_star_day_v1_koyomi',
+  } as const;
+}
+
+export function calculateDayStarFromSolstices(args:{
+  localDate:string;
+  currentSolsticeDate:string;
+  currentKind:SolsticeKind;
+  nextSolsticeDate:string;
+  nextKind:SolsticeKind;
+}){
+  const current=calculateTransitionFromSolstice(args.currentSolsticeDate,args.currentKind);
+  const next=calculateTransitionFromSolstice(args.nextSolsticeDate,args.nextKind);
+  return {
+    ...calculateDayStarFromTransitionPair(args.localDate,current,next),
+    currentTransition:current,
+    nextTransition:next,
+  };
+}
