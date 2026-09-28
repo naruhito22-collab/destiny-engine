@@ -37,3 +37,27 @@ replaceable so the engine is not permanently coupled to one external service.
 ## Environment
 
 Copy `.env.example` to `.env.local` and set Supabase/OpenAI credentials.
+
+
+## MVP runtime setup
+
+Required environment variables:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `OPENAI_API_KEY`
+- `DESTINY_SEED_SALT`
+- optional `OPENAI_MODEL` (default: `gpt-5.6-luna`)
+- optional `KYUREKI_API_BASE_URL`
+
+Database:
+
+1. Apply `supabase/migrations/20260928_001_initial.sql`.
+2. Enable email OTP / magic-link authentication in Supabase Auth.
+3. Add the deployed app URL plus `/auth/callback` to allowed redirect URLs.
+
+Current browser flow:
+
+`email login → profile → Daily Destiny → ACTION → saved action`
+
+The database unique constraints preserve one Daily Destiny row per user/date/engine version and one ACTION row per Daily Destiny record.
