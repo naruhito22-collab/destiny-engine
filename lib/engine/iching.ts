@@ -25,19 +25,87 @@ const HEXAGRAMS:[number,string,IChingPosture][]=[
 [57,'巽為風','CONNECT'],[58,'兌為沢','CONNECT'],[59,'風水渙','CHANGE'],[60,'水沢節','KEEP'],[61,'風沢中孚','CONNECT'],[62,'雷山小過','PREPARE'],[63,'水火既済','KEEP'],[64,'火水未済','PREPARE']
 ];
 
+
+type Trigram='QIAN'|'DUI'|'LI'|'ZHEN'|'XUN'|'KAN'|'GEN'|'KUN';
+
+const TRIGRAM_BITS:Record<Trigram,string>={
+  QIAN:'111',
+  DUI:'110',
+  LI:'101',
+  ZHEN:'100',
+  XUN:'011',
+  KAN:'010',
+  GEN:'001',
+  KUN:'000',
+};
+
+const TRIGRAM_ORDER:Trigram[]=['QIAN','DUI','LI','ZHEN','XUN','KAN','GEN','KUN'];
+
+// Rows = lower trigram, columns = upper trigram.
+// Values are King Wen hexagram numbers.
+const KING_WEN_MATRIX:number[][]=[
+  [1,43,14,34,9,5,26,11],
+  [10,58,38,54,61,60,41,19],
+  [13,49,30,55,37,63,22,36],
+  [25,17,21,51,42,3,27,24],
+  [44,28,50,32,57,48,18,46],
+  [6,47,64,40,59,29,4,7],
+  [33,31,56,62,53,39,52,15],
+  [12,45,35,16,20,8,23,2],
+];
+
+const HEXAGRAM_BY_ID=new Map(HEXAGRAMS.map(h=>[h[0],h] as const));
+
+function hexagramIdFromBits(bits:string){
+  if(!/^[01]{6}$/.test(bits)) throw new Error('hexagram bits must contain six 0/1 values');
+  const lowerBits=bits.slice(0,3);
+  const upperBits=bits.slice(3,6);
+  const lowerIndex=TRIGRAM_ORDER.findIndex(t=>TRIGRAM_BITS[t]===lowerBits);
+  const upperIndex=TRIGRAM_ORDER.findIndex(t=>TRIGRAM_BITS[t]===upperBits);
+  if(lowerIndex<0||upperIndex<0) throw new Error('invalid trigram bits');
+  return KING_WEN_MATRIX[lowerIndex][upperIndex];
+}
+
+function bitsFromHexagramId(id:number){
+  for(let lowerIndex=0;lowerIndex<8;lowerIndex++){
+    for(let upperIndex=0;upperIndex<8;upperIndex++){
+      if(KING_WEN_MATRIX[lowerIndex][upperIndex]===id){
+        return TRIGRAM_BITS[TRIGRAM_ORDER[lowerIndex]]+TRIGRAM_BITS[TRIGRAM_ORDER[upperIndex]];
+      }
+    }
+  }
+  throw new Error(`unknown hexagram id: ${id}`);
+}
+
+export function resultingHexagramId(hexagramId:number,changingLine:number){
+  if(changingLine<1||changingLine>6||!Number.isInteger(changingLine)){
+    throw new Error('changingLine must be an integer 1..6');
+  }
+  const bits=bitsFromHexagramId(hexagramId).split('');
+  const i=changingLine-1;
+  bits[i]=bits[i]==='1'?'0':'1';
+  return hexagramIdFromBits(bits.join(''));
+}
+
 export function drawIChing(seedHex:string){
   const [id,name,posture]=HEXAGRAMS[seededIndex(seedHex,64,12)];
   const changingLine=seededIndex(seedHex,6,24)+1;
+  const resultId=resultingHexagramId(id,changingLine);
+  const result=HEXAGRAM_BY_ID.get(resultId);
+  if(!result) throw new Error(`resulting hexagram not found: ${resultId}`);
+  const [,resultName,resultPosture]=result;
   return {
     hexagramId:id,
     hexagramName:name,
     primaryPosture:posture,
     changingLine,
-    resultingHexagramId:null,
-    secondaryPosture:null,
+    resultingHexagramId:resultId,
+    resultingHexagramName:resultName,
+    secondaryPosture:resultPosture,
+    secondaryCategoryScores:POSTURE_SCORES[resultPosture],
     categoryScores:POSTURE_SCORES[posture],
     caution:null,
     seedVersion:'daily_seed_v1',
-    calculationVersion:'iching_v1'
+    calculationVersion:'iching_v2'
   };
 }
