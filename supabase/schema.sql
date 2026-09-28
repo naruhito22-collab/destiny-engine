@@ -30,6 +30,8 @@ create table if not exists public.action_history (
   status text not null default 'NOT_STARTED' check (status in ('NOT_STARTED','DONE','SKIPPED','IMPOSSIBLE')),
   feedback text,
   note text,
+  generation_meta jsonb not null default '{}'::jsonb,
+  safety_check_result text not null default 'UNKNOWN',
   created_at timestamptz not null default now(),
   unique(daily_destiny_id)
 );
@@ -53,3 +55,7 @@ create policy "profiles own rows" on public.profiles for all using (auth.uid() =
 create policy "daily destiny own rows" on public.daily_destiny for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "action history own rows" on public.action_history for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "oracle own rows" on public.oracle_results for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Forward-compatible upgrades for existing databases
+alter table public.action_history add column if not exists generation_meta jsonb not null default '{}'::jsonb;
+alter table public.action_history add column if not exists safety_check_result text not null default 'UNKNOWN';
