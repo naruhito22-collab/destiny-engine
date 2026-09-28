@@ -1,10 +1,50 @@
-:root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#0a0a0a; color:#f5f5f5; }
+:root {
+  color-scheme: dark;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#0a0a0a;
+  color:#f5f5f5;
+}
 * { box-sizing:border-box; }
 body { margin:0; min-height:100vh; background:#0a0a0a; }
-.shell { width:min(760px, calc(100% - 40px)); margin:0 auto; padding:72px 0; }
+button,input,select { font:inherit; }
+.shell { width:min(760px, calc(100% - 40px)); margin:0 auto; padding:72px 0 120px; }
 .eyebrow,.muted { letter-spacing:.18em; font-size:12px; opacity:.55; }
-h1 { font-size:clamp(42px,8vw,78px); margin:18px 0 8px; font-weight:600; }
+h1 { font-size:clamp(42px,8vw,78px); margin:18px 0 8px; font-weight:600; letter-spacing:-.04em; }
 .lead { opacity:.72; margin-bottom:48px; }
-.card { border:1px solid #333; padding:28px; border-radius:20px; background:#111; }
-.card h2 { font-size:22px; line-height:1.5; font-weight:500; }
-button { margin-top:18px; padding:14px 18px; border-radius:999px; border:0; font-size:15px; }
+.stack { display:grid; gap:18px; }
+.card { border:1px solid #2d2d2d; padding:28px; border-radius:20px; background:#111; }
+.hero-card { margin-top:18px; }
+.card h2 { font-size:22px; line-height:1.5; font-weight:500; margin:0; }
+label { display:grid; gap:8px; font-size:13px; opacity:.82; }
+input,select {
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid #383838;
+  background:#0c0c0c;
+  color:#fff;
+}
+button {
+  width:max-content;
+  margin-top:4px;
+  padding:14px 20px;
+  border-radius:999px;
+  border:0;
+  background:#f5f5f5;
+  color:#111;
+  cursor:pointer;
+}
+button:disabled { opacity:.45; cursor:not-allowed; }
+button.secondary { background:#262626; color:#f5f5f5; border:1px solid #3c3c3c; }
+button.ghost { background:transparent; color:#aaa; padding:6px 0; margin:0; }
+.row { display:flex; align-items:center; gap:16px; }
+.between { justify-content:space-between; }
+.status { margin:0; font-size:13px; color:#bdbdbd; }
+.action-text { font-size:clamp(24px,4vw,36px); line-height:1.5; letter-spacing:-.02em; margin:8px 0; }
+.meta { margin:0; opacity:.55; font-size:13px; }
+.details { margin-top:24px; padding:0 4px; color:#aaa; font-size:13px; }
+.details p { margin:6px 0; }
+@media (max-width:600px){
+  .shell { width:min(100% - 28px,760px); padding-top:40px; }
+  .card { padding:22px; border-radius:16px; }
+}
