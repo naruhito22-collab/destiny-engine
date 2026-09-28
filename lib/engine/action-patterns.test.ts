@@ -7,14 +7,14 @@ test('there are exactly 36 initial action patterns',()=>{
 });
 
 test('pattern selection stays inside category and level',()=>{
-  const p=selectActionPattern({primaryCategory:'exploration',level:1,seedHex:'a'.repeat(64)});
+  const p=selectActionPattern({primaryCategory:'exploration',level:1,localDate:'2026-09-28',seedHex:'a'.repeat(64)});
   assert.equal(p.category,'exploration');
   assert.ok(p.allowedLevels.includes(1));
 });
 
 test('recently unused pattern is preferred',()=>{
   const p=selectActionPattern({
-    primaryCategory:'exploration',level:1,seedHex:'b'.repeat(64),
+    primaryCategory:'exploration',level:1,localDate:'2026-09-28',seedHex:'b'.repeat(64),
     recentHistory:[
       {patternId:'EXP-01',localDate:'2026-09-28'},
       {patternId:'EXP-02',localDate:'2026-09-27'},
