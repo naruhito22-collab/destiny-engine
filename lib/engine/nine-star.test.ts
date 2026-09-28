@@ -42,3 +42,23 @@ test('direction signal matches known 2026-09-22 structure',()=>{
 test('day break is the opposite direction of the day branch',()=>{
   assert.ok(['N','NE','E','SE','S','SW','W','NW'].includes(dayBreakDirection('2026-09-22')));
 });
+
+test('2026 transition dates match Koyomi reference', async()=>{
+  const { calculateTransitionFromSolstice } = await import('./nine-star');
+  assert.equal(calculateTransitionFromSolstice('2025-12-22','WINTER').transitionDate,'2025-12-21');
+  assert.equal(calculateTransitionFromSolstice('2026-06-21','SUMMER').transitionDate,'2026-06-19');
+  assert.equal(calculateTransitionFromSolstice('2026-12-22','WINTER').transitionDate,'2026-12-16');
+});
+
+test('2026-09-28 day star matches Koyomi reference', async()=>{
+  const { calculateDayStarFromSolstices } = await import('./nine-star');
+  const result=calculateDayStarFromSolstices({
+    localDate:'2026-09-28',
+    currentSolsticeDate:'2026-06-21',
+    currentKind:'SUMMER',
+    nextSolsticeDate:'2026-12-22',
+    nextKind:'WINTER',
+  });
+  assert.equal(result.star,7);
+  assert.equal(result.mode,'YIN');
+});
