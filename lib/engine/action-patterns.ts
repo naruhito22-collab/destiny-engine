@@ -66,6 +66,7 @@ export function selectActionPattern(args:{
   primaryCategory:Category;
   level:ActionLevel;
   seedHex:string;
+  localDate:string;
   recentHistory?:PatternHistory[];
   directionModifier?:string|null;
   timeModifier?:string|null;
@@ -77,7 +78,7 @@ export function selectActionPattern(args:{
   if(!candidates.length) throw new Error('No action pattern candidates');
 
   const dayMs=86400000;
-  const today=new Date(history[0]?.localDate??'1970-01-01').getTime();
+  const today=new Date(args.localDate).getTime();
   const recent7=new Set(history.filter(h=>today-new Date(h.localDate).getTime()<7*dayMs).map(h=>h.patternId));
   const unused7=candidates.filter(x=>!recent7.has(x.id));
   if(unused7.length) candidates=unused7;
