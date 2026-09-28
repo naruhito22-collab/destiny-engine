@@ -1,0 +1,10 @@
+:root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#0a0a0a; color:#f5f5f5; }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; background:#0a0a0a; }
+.shell { width:min(760px, calc(100% - 40px)); margin:0 auto; padding:72px 0; }
+.eyebrow,.muted { letter-spacing:.18em; font-size:12px; opacity:.55; }
+h1 { font-size:clamp(42px,8vw,78px); margin:18px 0 8px; font-weight:600; }
+.lead { opacity:.72; margin-bottom:48px; }
+.card { border:1px solid #333; padding:28px; border-radius:20px; background:#111; }
+.card h2 { font-size:22px; line-height:1.5; font-weight:500; }
+button { margin-top:18px; padding:14px 18px; border-radius:999px; border:0; font-size:15px; }
