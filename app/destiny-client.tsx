@@ -100,6 +100,7 @@ export default function DestinyClient(){
         const j=await r.json();if(!r.ok)throw new Error(j.error||'DAILY_CREATION_FAILED');
         active=j.daily;setDaily(active);
       }
+      if(!active)throw new Error('DAILY_DESTINY_NOT_FOUND');
       const r=await fetch('/api/oracle/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({daily_destiny_id:active.id,theme:oracleTheme})});
       const j=await r.json();if(!r.ok)throw new Error(j.error||'ORACLE_FAILED');
       setOracle(j.oracle);setMessage(j.reused?'今日のORACLEを読み込みました。':'ORACLEを演算しました。');
