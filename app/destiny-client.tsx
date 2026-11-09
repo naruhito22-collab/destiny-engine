@@ -63,7 +63,6 @@ export default function DestinyClient(){
     try{
       const r=await fetch('/api/profile',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
         birth_date:birthDate,
-        birth_time:null,
         timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Tokyo',
         default_level:level,
       })});
@@ -81,6 +80,7 @@ export default function DestinyClient(){
       const dj=await dres.json();
       if(!dres.ok) throw new Error(dj.error||'DAILY_CREATION_FAILED');
       setDaily(dj.daily);
+      setOracle(null);
 
       const ares=await fetch('/api/action/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({daily_destiny_id:dj.daily.id,level})});
       const aj=await ares.json();
