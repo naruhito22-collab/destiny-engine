@@ -6,7 +6,7 @@ import { generateServerDailyDestinyData } from './daily-destiny';
 import { requireServerEnv } from './env';
 import { getPreviousDailyDestiny, getProfile, insertDailyDestinyOnce } from './daily-repository';
 
-export const ENGINE_VERSION='0.1.0';
+export const ENGINE_VERSION='0.2.0';
 
 export async function createDailyDestinyForUser(args:{userId:string;localDate:string}){
   const profile=await getProfile(args.userId);
