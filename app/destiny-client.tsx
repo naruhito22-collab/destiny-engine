@@ -144,7 +144,7 @@ export default function DestinyClient(){
       <p className="muted">WHY｜今日の一手の根拠</p>
       {action.generation_meta.short_reason&&<p>{action.generation_meta.short_reason}</p>}
       {daily?.data&&<div className="evidence-grid">
-        <p>西洋占星術：{daily.data.astrology?.primaryCategory||daily.data.astrology?.categoryScores? '日々の傾向をCOREに反映':'詳細未取得'}</p>
+        <p>西洋占星術：{(daily.data.astrology?.primaryCategory||daily.data.astrology?.categoryScores)? '日々の傾向をCOREに反映':'詳細未取得'}</p>
         <p>数秘術：{daily.data.numerology?.actionType||'詳細未取得'}</p>
         <p>易：{daily.data.iching?.primaryPosture||'詳細未取得'}</p>
         <p>タロット：{daily.data.tarot?.primaryAction||'詳細未取得'}</p>
@@ -161,7 +161,7 @@ export default function DestinyClient(){
         <option value="general">総合</option><option value="love">恋愛</option><option value="work">仕事</option><option value="money">お金</option><option value="relationships">人間関係</option><option value="health">健康</option><option value="creation">創作</option>
       </select></label>
       <button onClick={consultOracle} disabled={busy||!birthDate}>{busy?'演算中…':'ORACLEを占う'}</button>
-      {oracle?.result&&<div className="stack"><h2>{oracle.result.title}</h2><p>{oracle.result.reading}</p><p><strong>今日のヒント：</strong>{oracle.result.suggestion}</p><p className="meta">{oracle.result.basis}</p></div>}
+      {oracle?.result&&<div className="stack"><h2>{oracle.result.title}</h2><p>{oracle.result.reading}</p><p><strong>今日のヒント：</strong>{oracle.result.suggestion}</p><p className="meta">{oracle.result.basis}</p><p className="meta">{oracle.result.disclaimer}</p></div>}
     </section>
 
     {daily&&<section className="details">
