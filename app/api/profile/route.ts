@@ -16,7 +16,7 @@ export async function POST(request:Request){
     const {data,error}=await supabase.from('profiles').upsert({
       id:user.id,
       birth_date:body.birth_date,
-      birth_time:body.birth_time||null,
+      birth_time:null,
       timezone:body.timezone,
       default_level:body.default_level,
       updated_at:new Date().toISOString(),
