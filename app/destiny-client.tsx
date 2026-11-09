@@ -6,6 +6,8 @@ import { getSupabaseBrowserClient } from '@/lib/browser/supabase';
 
 type DailyRow={id:string;data:any};
 type ActionRow={action_text:string;level:number;generation_meta?:any};
+const CATEGORY_LABELS:Record<string,string>={exploration:'探索',connection:'つながり',creation:'創造',learning:'学び',challenge:'挑戦',organization:'整理',reflection:'内省',body:'身体',contribution:'貢献',change:'変化',decision:'決断',chance:'機会'};
+const categoryLabel=(value:unknown)=>typeof value==='string'?(CATEGORY_LABELS[value]||value):'—';
 
 function todayLocal(){
   const d=new Date();
@@ -33,6 +35,24 @@ export default function DestinyClient(){
     const {data}=supabase.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setLoggedIn(Boolean(session)));
     return ()=>data.subscription.unsubscribe();
   },[]);
+
+  useEffect(()=>{
+    if(!loggedIn) return;
+    let cancelled=false;
+    async function restoreToday(){
+      try{
+        const r=await fetch(`/api/daily?date=${todayLocal()}`,{cache:'no-store'});
+        if(!r.ok)return;
+        const j=await r.json();
+        if(cancelled||!j.daily)return;
+        setDaily(j.daily);
+        const a=await fetch(`/api/action?daily_destiny_id=${encodeURIComponent(j.daily.id)}`,{cache:'no-store'});
+        if(a.ok){const result=await a.json();if(!cancelled)setAction(result.action||null);}
+      }catch{ /* The user can still generate a new reading. */ }
+    }
+    restoreToday();
+    return ()=>{cancelled=true;};
+  },[loggedIn]);
 
   useEffect(()=>{
     if(!loggedIn) return;
@@ -149,10 +169,10 @@ export default function DestinyClient(){
       <p className="muted">WHY｜今日の一手の根拠</p>
       {action.generation_meta.short_reason&&<p>{action.generation_meta.short_reason}</p>}
       {daily?.data&&<div className="evidence-grid">
-        <p>西洋占星術：{daily.data.astrology?.primaryCategory||'詳細未取得'}（出生時刻不明・月の出生位置を除外）</p>
+        <p>西洋占星術：{categoryLabel(daily.data.astrology?.primaryCategory)}（出生時刻不明・月の出生位置を除外）</p>
         <p>数秘術：{daily.data.numerology?.actionType||'詳細未取得'}</p>
         <p>易：{daily.data.iching?.primaryPosture||'詳細未取得'}</p>
-        <p>タロット：{daily.data.tarot?.primaryAction||'詳細未取得'}</p>
+        <p>タロット：{categoryLabel(daily.data.tarot?.primaryAction)}</p>
         <p>九星気学：{daily.data.nineStarKi?.directionModifier||'方向補正なし'}</p>
         <p>六曜：{daily.data.rokuyo?.timeModifier||daily.data.rokuyo?.tempoModifier||'時間補正なし'}</p>
       </div>}
@@ -171,8 +191,8 @@ export default function DestinyClient(){
 
     {daily&&<section className="details">
       <p className="muted">CORE</p>
-      <p>Primary: {daily.data?.coreResult?.primaryCategory||'—'}</p>
-      <p>Secondary: {daily.data?.coreResult?.secondaryCategory||'—'}</p>
+      <p>中心テーマ：{categoryLabel(daily.data?.coreResult?.primaryCategory)}</p>
+      <p>補助テーマ：{categoryLabel(daily.data?.coreResult?.secondaryCategory)}</p>
     </section>}
   </div>;
 }
