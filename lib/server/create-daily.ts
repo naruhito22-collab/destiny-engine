@@ -15,8 +15,8 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
   }
 
   const timezone=profile.timezone||'Asia/Tokyo';
-  const existingBirthTime=typeof profile.birth_time==='string'&&profile.birth_time.length>=5;
-  const natalLocalTime=existingBirthTime?profile.birth_time:'12:00:00';
+  // Birth time is intentionally not collected; noon is a deterministic approximation.
+  const natalLocalTime='12:00:00';
   const natalDate=localDateTimeToUtcDate(profile.birth_date,natalLocalTime,timezone);
   const transitDate=localDateTimeToUtcDate(args.localDate,'12:00:00',timezone);
 
@@ -33,7 +33,7 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
     engineVersion:ENGINE_VERSION,
     seedSalt:requireServerEnv('DESTINY_SEED_SALT'),
     birthDate:profile.birth_date,
-    birthTimeAvailable:existingBirthTime,
+    birthTimeAvailable:false,
     natal:astrologyInstantFromDate(natalDate),
     transit:astrologyInstantFromDate(transitDate),
     previousPrimaryCategory:previousPrimary,
