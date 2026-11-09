@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ENGINE_VERSION } from '@/lib/server/create-daily';
 import { getTodayDailyDestiny, requireAuthenticatedUser } from '@/lib/server/action-repository';
 
 export async function GET(request:Request){
@@ -6,7 +7,7 @@ export async function GET(request:Request){
     const {user}=await requireAuthenticatedUser();
     const url=new URL(request.url);
     const localDate=url.searchParams.get('date');
-    const engineVersion=url.searchParams.get('engine_version')||undefined;
+    const engineVersion=ENGINE_VERSION;
     if(!localDate||!/^\d{4}-\d{2}-\d{2}$/.test(localDate)){
       return NextResponse.json({error:'INVALID_DATE'},{status:400});
     }
