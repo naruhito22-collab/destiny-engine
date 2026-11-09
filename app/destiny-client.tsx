@@ -145,7 +145,7 @@ export default function DestinyClient(){
       <p className="muted">WHY｜今日の一手の根拠</p>
       {action.generation_meta.short_reason&&<p>{action.generation_meta.short_reason}</p>}
       {daily?.data&&<div className="evidence-grid">
-        <p>西洋占星術：{(daily.data.astrology?.primaryCategory||daily.data.astrology?.categoryScores)? '日々の傾向をCOREに反映':'詳細未取得'}</p>
+        <p>西洋占星術：{daily.data.astrology?.primaryCategory||'詳細未取得'}（出生時刻不明・月の出生位置を除外）</p>
         <p>数秘術：{daily.data.numerology?.actionType||'詳細未取得'}</p>
         <p>易：{daily.data.iching?.primaryPosture||'詳細未取得'}</p>
         <p>タロット：{daily.data.tarot?.primaryAction||'詳細未取得'}</p>
