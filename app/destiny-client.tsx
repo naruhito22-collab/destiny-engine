@@ -95,6 +95,10 @@ export default function DestinyClient(){
     setBusy(true);setMessage('ORACLEを演算しています…');
     try{
       let active=daily;
+      if(active?.data?.identity?.localDate!==todayLocal()){
+        active=null;
+        setDaily(null);setAction(null);setOracle(null);
+      }
       if(!active){
         const r=await fetch('/api/daily/create',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({local_date:todayLocal()})});
         const j=await r.json();if(!r.ok)throw new Error(j.error||'DAILY_CREATION_FAILED');
