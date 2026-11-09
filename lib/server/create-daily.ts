@@ -15,9 +15,10 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
   }
 
   const timezone=profile.timezone||'Asia/Tokyo';
-  // Birth time is intentionally not collected; noon is a deterministic approximation.
-  const natalLocalTime='12:00:00';
-  const natalDate=localDateTimeToUtcDate(profile.birth_date,natalLocalTime,timezone);
+  // Birth location and time are unknown. Use a fixed UTC noon reference,
+  // never the user's current timezone as a proxy for their birthplace.
+  // Time-sensitive natal factors must be excluded by the astrology engine.
+  const natalDate=new Date(`${profile.birth_date}T12:00:00.000Z`);
   const transitDate=localDateTimeToUtcDate(args.localDate,'12:00:00',timezone);
 
   const birthYear=Number(profile.birth_date.slice(0,4));
