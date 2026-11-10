@@ -23,7 +23,7 @@ export type GenerateActionInput={
 function durationRule(level:1|2|3){
   if(level===1) return '5〜15分';
   if(level===2) return '30〜60分';
-  return '60〜360分';
+  return '5〜60分';
 }
 
 export async function generateActionWithOpenAI(input:GenerateActionInput){
@@ -33,6 +33,9 @@ export async function generateActionWithOpenAI(input:GenerateActionInput){
   const instructions=[
     'あなたはDESTINY ENGINEのACTION具体化器。占術計算を変更してはいけない。',
     '今日の24時間の中で実行できる具体的な行動を1件だけ生成する。24時間連続の作業は要求しない。抽象的助言や複数案は禁止。',
+    'action_textは日本語で40〜60文字以内を目安に、短く一目でわかる一つの行動だけを書く。長い説明、複数段階の手順、比較表、複数の選択肢、理由の説明を入れない。',
+    '通話30分、外出60分、予算、日時などの細かい数値指定をaction_textに入れない。estimated_minutesは内部の見積もりとして別に返す。',
+    'ユーザーの予定、交友関係、現在地、金銭状況を推測して決めつけない。相手の協力や約束が必要な行動を必須にせず、本人だけで今日着手できる形にする。',
     '重大な人生判断、高額支出、投資、借金、ギャンブル、退職、契約、結婚離婚、医療判断、危険行為は禁止。',
     '指定patternを必ず維持する。九星方位と六曜は自然に使える場合だけ反映する。',
     'risk_flagsは安全上の懸念がなければ空配列。',
@@ -88,7 +91,7 @@ export async function generateActionWithOpenAI(input:GenerateActionInput){
   return {
     ...parsed,
     model,
-    generationVersion:'action_prompt_v1',
+    generationVersion:'action_prompt_v2',
     safetyCheckResult:'PASS' as const,
   };
 }
