@@ -135,12 +135,22 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
     health:`「${LABELS[primary]}」は、体調の予言ではなく、今日の休息や生活リズムを整える視点として読みます。`,
     creation:`「${LABELS[primary]}」は、発想をどのように形にするかという創作上の手掛かりです。`,
   };
+  const themeEvidence:Record<OracleTheme,string>={
+    general:postureText?`易の「${postureText}」を、一日の動き方の手掛かりにします。`:'今日の中心テーマを優先順位の手掛かりにします。',
+    love:postureText?`易の「${postureText}」は、気持ちを伝えるタイミングや相手との距離感を考える視点になります。`:'関係を急がず相手の意向を確認する視点が中心です。',
+    work:postureText?`易の「${postureText}」は、進行中の仕事で決めることと確認することを分ける視点になります。`:'仕事の優先順位を整理する視点が中心です。',
+    money:postureText?`易の「${postureText}」は、支出を即決するか保留するかを点検する視点になります。`:'金銭面では比較と確認を重視します。',
+    relationships:postureText?`易の「${postureText}」は、会話を進めるか一度相手の話を聞くかを考える視点になります。`:'対話の進め方を考える視点が中心です。',
+    health:postureText?`易の「${postureText}」は、無理をせず活動と休息の配分を見直す視点になります。`:'生活リズムを見直す視点が中心です。',
+    creation:postureText?`易の「${postureText}」は、試作を進めるか観察と収集に時間を使うかを考える視点になります。`:'発想を試作へつなぐ視点が中心です。',
+  };
   const reading=[
     `${lead[theme]}、焦点は「${ctx.focus}」です。`,
     themeInterpretations[theme],
-    postureText?`易の姿勢「${postureText}」をこの領域に当てはめるなら、${ctx.approach}ことが考えられます。`:`この領域では、${ctx.approach}ことが考えられます。`,
+    themeEvidence[theme],
+    `具体的には、${ctx.approach}ことが考えられます。`,
     numberText?`数秘術の「${numberText}」は、${ctx.question}という問いを考える補助線になります。`:`考える問いは「${ctx.question}」です。`,
-    moodText?`タロットの「${moodText}」という視点も、行動の強弱を調整する参考になります。`:'',
+    moodText?`タロットの「${moodText}」という視点も、${ctx.focus}を考える際の補助的な材料になります。`:'',
     `ただし、${ctx.boundary}。`,
   ].filter(Boolean).join(' ');
 
@@ -159,6 +169,6 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
     suggestion:`${entry.suggestions[primary]}。${tempoAdvice}`,
     basis:basis.join('｜'),
     disclaimer:'伝統的占術体系を元にした独自の解釈で、科学的な未来予測ではありません。健康・投資・法律等の専門的判断を代替しません。',
-    calculationVersion:'oracle-rules-v3',
+    calculationVersion:'oracle-rules-v4',
   };
 }
