@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuthenticatedUser } from '@/lib/server/action-repository';
-import { buildOracleReading, type OracleTheme } from '@/lib/engine/oracle-reading';
+import { generateOracleWithOpenAI, ORACLE_AI_VERSION } from '@/lib/server/generate-oracle';
 import type { DailyDestinyData } from '@/lib/types/destiny';
 
 const Body=z.object({
@@ -20,17 +20,17 @@ export async function POST(request:Request){
       .eq('user_id',user.id).eq('daily_destiny_id',daily.id).eq('theme',body.theme).maybeSingle();
     if(existingError)throw existingError;
     if(existing){
-      if(existing.result?.calculationVersion==='oracle-rules-v6'){
+      if(existing.result?.calculationVersion===ORACLE_AI_VERSION){
         return NextResponse.json({oracle:existing,reused:true});
       }
       // Preserve the existing row identity and audit timestamp; replace only its obsolete interpretation.
-      const updatedResult=buildOracleReading(daily.data as DailyDestinyData,body.theme as OracleTheme);
+      const updatedResult=await generateOracleWithOpenAI(daily.data as DailyDestinyData,body.theme);
       const {data:updated,error:updateError}=await supabase.from('oracle_results')
         .update({result:updatedResult}).eq('id',existing.id).eq('user_id',user.id).select('*').single();
       if(updateError)throw updateError;
       return NextResponse.json({oracle:updated,reused:false,upgraded:true});
     }
-    const result=buildOracleReading(daily.data as DailyDestinyData,body.theme as OracleTheme);
+    const result=await generateOracleWithOpenAI(daily.data as DailyDestinyData,body.theme);
     const {data:created,error:insertError}=await supabase.from('oracle_results').insert({
       user_id:user.id,daily_destiny_id:daily.id,theme:body.theme,result,
     }).select('*').single();
