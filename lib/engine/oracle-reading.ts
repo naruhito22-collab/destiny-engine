@@ -118,13 +118,16 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
     health:{exploration:'気分転換を試したい日。',connection:'誰かに話すと気持ちが軽くなるかも。',creation:'好きなことを楽しみたい日。',learning:'自分の体調を知ることが大切な日。',challenge:'無理のない運動を始めたい日。',organization:'睡眠と休憩を整えたい日。',reflection:'疲れや気分を振り返りたい日。',body:'休息を優先したい日。',contribution:'自分自身もいたわりたい日。',change:'負担の大きい習慣を変えたい日。',decision:'休む時間を先に確保したい日。',chance:'ひと息つける機会を逃さない日。'},
     creation:{exploration:'未知の表現に出会いたい日。',connection:'誰かとの会話から発想が広がる日。',creation:'ひらめきを形にしたい日。',learning:'新しい技法を吸収したい日。',challenge:'普段と違う表現を試したい日。',organization:'アイデアを整理したい日。',reflection:'作品の核を見つめたい日。',body:'作品から少し離れてみたい日。',contribution:'他者の反応を取り入れたい日。',change:'いつもの表現を変えてみたい日。',decision:'制作の方向を一つ選びたい日。',chance:'偶然の発見を生かしたい日。'},
   };
-  const postureHint:Record<string,string>={
-    GO:'今日は少し前に進めてみましょう。',WAIT:'急がず、準備を整えるのがよさそうです。',
-    CHANGE:'やり方を少し変えるとよさそうです。',KEEP:'今のペースを大切にしましょう。',
-    CONNECT:'一人で抱えず、誰かと話してみましょう。',WITHDRAW:'一度距離を置いて考えてみましょう。',
-    PREPARE:'まず準備から始めましょう。',OBSERVE:'すぐに決めず、様子を見てみましょう。',
+  const domainAction:Record<OracleTheme,Record<string,string>>={
+    general:{GO:'気になる予定を一つ進めて。',WAIT:'大事な予定の準備を整えて。',CHANGE:'いつもの順番を変えてみて。',KEEP:'今の生活リズムを大切に。',CONNECT:'誰かとの会話に時間を使って。',WITHDRAW:'一人で考える時間を取って。',PREPARE:'明日の予定を先に整えて。',OBSERVE:'今日は周囲の変化をよく見て。'},
+    love:{GO:'伝えたい気持ちを一言にして。',WAIT:'返事を急かさず待ってみて。',CHANGE:'いつもと違う誘い方を試して。',KEEP:'安心できる関係を大切にして。',CONNECT:'相手に短い連絡をしてみて。',WITHDRAW:'相手にも自分にも余白を作って。',PREPARE:'話したいことを整理して。',OBSERVE:'相手の反応を丁寧に受け止めて。'},
+    work:{GO:'保留していた仕事を一つ進めて。',WAIT:'判断材料が揃うまで結論を保留して。',CHANGE:'行き詰まった手順を変えてみて。',KEEP:'進行中の仕事を着実に仕上げて。',CONNECT:'関係者と認識を合わせて。',WITHDRAW:'不要な会議や作業を一つ減らして。',PREPARE:'決断に必要な資料を揃えて。',OBSERVE:'判断する前に状況を確認して。'},
+    money:{GO:'必要な買い物だけに絞って。',WAIT:'大きな支払いは条件を確かめてから。',CHANGE:'毎月の支出を一つ見直して。',KEEP:'決めた予算を守って。',CONNECT:'共同の費用について話し合って。',WITHDRAW:'衝動買いから少し離れて。',PREPARE:'支出の見積もりを確認して。',OBSERVE:'買う前に価格を比較して。'},
+    relationships:{GO:'気になる相手に声をかけて。',WAIT:'相手の返事を待つ余裕を持って。',CHANGE:'いつもと違う言い方を試して。',KEEP:'信頼できる関係を大切にして。',CONNECT:'一人で抱えず相談して。',WITHDRAW:'無理な付き合いから距離を取って。',PREPARE:'伝えたい要点を整理して。',OBSERVE:'まず相手の話を最後まで聞いて。'},
+    health:{GO:'無理のない軽い運動を取り入れて。',WAIT:'疲れがあれば休むことを優先して。',CHANGE:'負担になっている習慣を見直して。',KEEP:'続けられている生活習慣を大切に。',CONNECT:'困りごとは信頼できる人に相談して。',WITHDRAW:'予定を一つ減らして休んで。',PREPARE:'睡眠や休憩の時間を確保して。',OBSERVE:'今日は疲れ具合を確かめて。'},
+    creation:{GO:'思いついた案を小さく試作して。',WAIT:'制作を急がず素材を集めて。',CHANGE:'いつもと違う表現を試して。',KEEP:'制作中の作品を一歩進めて。',CONNECT:'アイデアを誰かに話してみて。',WITHDRAW:'作品から離れて新鮮な目で見て。',PREPARE:'必要な素材や道具を揃えて。',OBSERVE:'気になる形や色を観察して。'},
   };
-  const reading=[headline[theme][primary],posture&&postureHint[posture]?postureHint[posture]:'まずはできることを一つ選びましょう。'].join(' ');
+  const reading=[headline[theme][primary],domainAction[theme][posture??'']??entry.suggestions[primary]+'。'].join(' ');
   const basis:string[]=[`CORE: ${LABELS[primary]}${secondary?` / ${LABELS[secondary]}`:''}`];
   if(personalDay!==null&&numberAction&&NUMBER_ACTION[numberAction])basis.push(`数秘術: ${personalDay} / ${numberAction}`);
   if(hexagram&&posture&&POSTURE[posture])basis.push(`易: ${hexagram} / ${posture}`);
@@ -132,14 +135,13 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
   if(astroCategory)basis.push(`西洋占星術: ${LABELS[astroCategory]}（出生時刻・出生地不明の近似）`);
   if(direction&&DIR[direction])basis.push(`九星気学: ${DIR[direction]}（独自方位シグナル）`);
   if(rokuyoName)basis.push(`六曜: ${rokuyoName}`);
-  const tempoAdvice=tempo&&TEMPO[tempo]?` 六曜のテンポ補正では「${TEMPO[tempo]}」を参考にできます。`:'';
 
   return {
     title:entry.title,
     reading,
-    suggestion:`${entry.suggestions[primary]}。${tempoAdvice}`,
+    suggestion:`${entry.suggestions[primary]}。`,
     basis:basis.join('｜'),
     disclaimer:'伝統的占術体系を元にした独自の解釈で、科学的な未来予測ではありません。健康・投資・法律等の専門的判断を代替しません。',
-    calculationVersion:'oracle-rules-v5',
+    calculationVersion:'oracle-rules-v6',
   };
 }
