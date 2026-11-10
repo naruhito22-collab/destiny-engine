@@ -19,6 +19,7 @@ function todayLocal(){
 
 export default function DestinyClient(){
   const [email,setEmail]=useState('');
+  const [guestError,setGuestError]=useState('');
   const [loggedIn,setLoggedIn]=useState(false);
   const [birthDate,setBirthDate]=useState('');
   const [daily,setDaily]=useState<DailyRow|null>(null);
@@ -34,7 +35,13 @@ export default function DestinyClient(){
 
   useEffect(()=>{
     const supabase=getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({data}:{data:{session:Session|null}})=>setLoggedIn(Boolean(data.session)));
+    supabase.auth.getSession().then(async ({data}:{data:{session:Session|null}})=>{
+      if(data.session){setLoggedIn(true);return;}
+      // Anonymous Supabase Auth retains a private user id and session per browser.
+      // If the provider is disabled, keep the existing email login as a safe fallback.
+      const {error}=await supabase.auth.signInAnonymously();
+      if(error)setGuestError('メール不要の利用設定がまだ有効ではありません。');
+    }).catch(()=>setGuestError('接続できませんでした。再読み込みしてください。'));
     const {data}=supabase.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setLoggedIn(Boolean(session)));
     return ()=>data.subscription.unsubscribe();
   },[]);
@@ -154,11 +161,15 @@ export default function DestinyClient(){
 
   if(!loggedIn){
     return <section className="card stack">
-      <p className="muted">SIGN IN</p>
-      <h2>メールでログイン</h2>
+      <p className="muted">DESTINY ENGINE</p>
+      <h2>{guestError?'メールでログイン':'準備しています…'}</h2>
+      {!guestError&&<p className="meta">初回の利用者設定を行っています。</p>}
+      {guestError&&<p className="status">{guestError}</p>}
+      {guestError&&<>
       <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" />
       <button onClick={sendMagicLink} disabled={busy||!email}>ログインリンクを送る</button>
       {message&&<p className="status">{message}</p>}
+      </>}
     </section>;
   }
 
