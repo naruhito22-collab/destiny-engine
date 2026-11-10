@@ -109,51 +109,22 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
   const rokuyoName=str(rokuyo.rokuyoName);
   const tempo=str(rokuyo.tempoModifier);
 
-  const contexts:Record<OracleTheme,{focus:string;question:string;approach:string;boundary:string}>={
-    general:{focus:'一日の流れと優先順位',question:'今日、何を優先すると気持ちよく過ごせるか',approach:'予定を広げすぎず、最も大切なことを一つ選ぶ',boundary:'一つの兆しだけで一日全体を決めつけない'},
-    love:{focus:'親密さ・気持ちの伝達・相互理解',question:'相手の気持ちを決めつけずに距離を縮めるにはどうするか',approach:'相手の意向を確かめ、押しつけずに気持ちを伝える',boundary:'相手の本心や恋愛の成否は占術から断定できない'},
-    work:{focus:'仕事の判断・段取り・関係者との合意',question:'仕事でいま判断すべきことと、確認が必要なことは何か',approach:'保留中の判断材料を整理し、関係者との認識を合わせる',boundary:'契約や人事など重大な判断は現実の情報で行う'},
-    money:{focus:'支出・予算・金銭的な優先順位',question:'支出を決める前に何を比較・確認すべきか',approach:'費用と必要性を照らし合わせ、保留中の支出を見直す',boundary:'値上がりや収益を予測するものではなく、投資判断には使わない'},
-    relationships:{focus:'周囲との協力・対話・境界線',question:'誤解を減らし、相手と無理なく協力するにはどうするか',approach:'相手の希望を聞き、自分の都合も明確に伝える',boundary:'他人の意図や行動を決めつけない'},
-    health:{focus:'休息・生活リズム・心身の負担',question:'今日の負担を軽くするために見直せることは何か',approach:'睡眠・休憩・活動量を無理なく整える',boundary:'病気の有無や体調の未来は占えず、症状の判断は専門家に相談する'},
-    creation:{focus:'着想・試作・表現の選択',question:'発想を実際の作品に近づけるには何を試せるか',approach:'素材や発想を一つ選び、小さな試作に落とす',boundary:'作品の評価や成功を保証するものではない'},
+  const headline:Record<OracleTheme,Record<Category,string>>={
+    general:{exploration:'新しい発見がありそうな日。',connection:'人との会話がヒントになる日。',creation:'アイデアを形にしたい日。',learning:'知ることから運が動く日。',challenge:'小さな挑戦に向く日。',organization:'身の回りを整えたい日。',reflection:'落ち着いて考えたい日。',body:'無理せず自分をいたわる日。',contribution:'人を助けることが充実につながる日。',change:'いつものやり方を変えてみたい日。',decision:'迷いを整理したい日。',chance:'思いがけない機会に目を向けたい日。'},
+    love:{exploration:'相手の新しい一面に気づけそう。',connection:'素直な会話が距離を縮める日。',creation:'一緒に楽しむ時間を作りたい日。',learning:'相手をよく知ることが大切な日。',challenge:'気持ちを少し伝えてみたい日。',organization:'連絡や約束を整えたい日。',reflection:'自分の本心を確かめたい日。',body:'無理に恋を進めなくていい日。',contribution:'小さな思いやりが大切な日。',change:'接し方を少し変えてみたい日。',decision:'関係への希望をはっきりさせたい日。',chance:'自然な出会いや会話を大切にしたい日。'},
+    work:{exploration:'新しい仕事の進め方を探したい日。',connection:'周囲との連携が鍵になる日。',creation:'アイデアを提案に変えたい日。',learning:'調べてから動くとよい日。',challenge:'難しい仕事に一歩踏み出したい日。',organization:'仕事の優先順位を整えたい日。',reflection:'進め方を見直したい日。',body:'無理のないペースが大切な日。',contribution:'チームを支える行動が生きる日。',change:'仕事のやり方を変えてみたい日。',decision:'保留中の判断に向き合いたい日。',chance:'新しい仕事の機会を確かめたい日。'},
+    money:{exploration:'買う前の比較が大切な日。',connection:'お金の話をすり合わせたい日。',creation:'お金をかけずに工夫したい日。',learning:'料金や条件を確かめたい日。',challenge:'固定費の見直しを始めたい日。',organization:'支出を整理したい日。',reflection:'衝動買いを見直したい日。',body:'疲れているときの大きな買い物は慎重に。',contribution:'共同のお金の使い方を確認したい日。',change:'毎月の支払いを見直したい日。',decision:'お金の決断は比較してから。',chance:'お得な代案を探したい日。'},
+    relationships:{exploration:'新しい人との会話に目を向けたい日。',connection:'相手の話を聞くことが大切な日。',creation:'誰かと一緒に考えるとよい日。',learning:'相手の立場を知りたい日。',challenge:'必要な相談を切り出したい日。',organization:'連絡や約束を整理したい日。',reflection:'すれ違いを振り返りたい日。',body:'人付き合いで無理をしない日。',contribution:'小さな手助けが生きる日。',change:'伝え方を工夫したい日。',decision:'人との距離感を見直したい日。',chance:'偶然の会話を大切にしたい日。'},
+    health:{exploration:'気分転換を試したい日。',connection:'誰かに話すと気持ちが軽くなるかも。',creation:'好きなことを楽しみたい日。',learning:'自分の体調を知ることが大切な日。',challenge:'無理のない運動を始めたい日。',organization:'睡眠と休憩を整えたい日。',reflection:'疲れや気分を振り返りたい日。',body:'休息を優先したい日。',contribution:'自分自身もいたわりたい日。',change:'負担の大きい習慣を変えたい日。',decision:'休む時間を先に確保したい日。',chance:'ひと息つける機会を逃さない日。'},
+    creation:{exploration:'未知の表現に出会いたい日。',connection:'誰かとの会話から発想が広がる日。',creation:'ひらめきを形にしたい日。',learning:'新しい技法を吸収したい日。',challenge:'普段と違う表現を試したい日。',organization:'アイデアを整理したい日。',reflection:'作品の核を見つめたい日。',body:'作品から少し離れてみたい日。',contribution:'他者の反応を取り入れたい日。',change:'いつもの表現を変えてみたい日。',decision:'制作の方向を一つ選びたい日。',chance:'偶然の発見を生かしたい日。'},
   };
-  const ctx=contexts[theme];
-  const postureText=posture&&POSTURE[posture]?POSTURE[posture]:null;
-  const numberText=numberAction&&NUMBER_ACTION[numberAction]?NUMBER_ACTION[numberAction]:null;
-  const moodText=mood&&MOOD[mood]?MOOD[mood]:null;
-  const lead:Record<OracleTheme,string>={
-    general:'今日全体の流れを見ると',love:'恋愛や親密な関係では',work:'仕事の進め方では',
-    money:'金銭面では',relationships:'対人関係では',health:'心身のセルフケアでは',creation:'創作活動では',
+  const postureHint:Record<string,string>={
+    GO:'今日は少し前に進めてみましょう。',WAIT:'急がず、準備を整えるのがよさそうです。',
+    CHANGE:'やり方を少し変えるとよさそうです。',KEEP:'今のペースを大切にしましょう。',
+    CONNECT:'一人で抱えず、誰かと話してみましょう。',WITHDRAW:'一度距離を置いて考えてみましょう。',
+    PREPARE:'まず準備から始めましょう。',OBSERVE:'すぐに決めず、様子を見てみましょう。',
   };
-  const themeInterpretations:Record<OracleTheme,string>={
-    general:`「${LABELS[primary]}」を軸に、一日の優先順位を考える読みです。`,
-    love:`「${LABELS[primary]}」は、相手との関係にどう向き合うかを考える手掛かりです。気持ちを伝える前に相互理解を意識します。`,
-    work:`「${LABELS[primary]}」は、仕事の意思決定や段取りを見直す手掛かりです。成果を急ぐより判断材料を確かめる視点が中心です。`,
-    money:`「${LABELS[primary]}」は、収入の予言ではなく支出や予算の扱い方を考える手掛かりです。`,
-    relationships:`「${LABELS[primary]}」は、相手との距離感や協力の仕方を考える手掛かりです。`,
-    health:`「${LABELS[primary]}」は、体調の予言ではなく、今日の休息や生活リズムを整える視点として読みます。`,
-    creation:`「${LABELS[primary]}」は、発想をどのように形にするかという創作上の手掛かりです。`,
-  };
-  const themeEvidence:Record<OracleTheme,string>={
-    general:postureText?`易の「${postureText}」を、一日の動き方の手掛かりにします。`:'今日の中心テーマを優先順位の手掛かりにします。',
-    love:postureText?`易の「${postureText}」は、気持ちを伝えるタイミングや相手との距離感を考える視点になります。`:'関係を急がず相手の意向を確認する視点が中心です。',
-    work:postureText?`易の「${postureText}」は、進行中の仕事で決めることと確認することを分ける視点になります。`:'仕事の優先順位を整理する視点が中心です。',
-    money:postureText?`易の「${postureText}」は、支出を即決するか保留するかを点検する視点になります。`:'金銭面では比較と確認を重視します。',
-    relationships:postureText?`易の「${postureText}」は、会話を進めるか一度相手の話を聞くかを考える視点になります。`:'対話の進め方を考える視点が中心です。',
-    health:postureText?`易の「${postureText}」は、無理をせず活動と休息の配分を見直す視点になります。`:'生活リズムを見直す視点が中心です。',
-    creation:postureText?`易の「${postureText}」は、試作を進めるか観察と収集に時間を使うかを考える視点になります。`:'発想を試作へつなぐ視点が中心です。',
-  };
-  const reading=[
-    `${lead[theme]}、焦点は「${ctx.focus}」です。`,
-    themeInterpretations[theme],
-    themeEvidence[theme],
-    `具体的には、${ctx.approach}ことが考えられます。`,
-    numberText?`数秘術の「${numberText}」は、${ctx.question}という問いを考える補助線になります。`:`考える問いは「${ctx.question}」です。`,
-    moodText?`タロットの「${moodText}」という視点も、${ctx.focus}を考える際の補助的な材料になります。`:'',
-    `ただし、${ctx.boundary}。`,
-  ].filter(Boolean).join(' ');
-
+  const reading=[headline[theme][primary],posture&&postureHint[posture]?postureHint[posture]:'まずはできることを一つ選びましょう。'].join(' ');
   const basis:string[]=[`CORE: ${LABELS[primary]}${secondary?` / ${LABELS[secondary]}`:''}`];
   if(personalDay!==null&&numberAction&&NUMBER_ACTION[numberAction])basis.push(`数秘術: ${personalDay} / ${numberAction}`);
   if(hexagram&&posture&&POSTURE[posture])basis.push(`易: ${hexagram} / ${posture}`);
@@ -169,6 +140,6 @@ export function buildOracleReading(input:DailyDestinyData,theme:OracleTheme):Ora
     suggestion:`${entry.suggestions[primary]}。${tempoAdvice}`,
     basis:basis.join('｜'),
     disclaimer:'伝統的占術体系を元にした独自の解釈で、科学的な未来予測ではありません。健康・投資・法律等の専門的判断を代替しません。',
-    calculationVersion:'oracle-rules-v4',
+    calculationVersion:'oracle-rules-v5',
   };
 }
