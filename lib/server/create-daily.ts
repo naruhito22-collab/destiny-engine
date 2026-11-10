@@ -24,7 +24,7 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
   const birthYear=Number(profile.birth_date.slice(0,4));
   const risshun=findSolarTerm(birthYear,'RISSHUN',timezone);
   const solstices=solsticePairForDate(args.localDate,timezone);
-  const previous=await getPreviousDailyDestiny(args.userId,args.localDate);
+  const previous=await getPreviousDailyDestiny(args.userId,args.localDate,ENGINE_VERSION);
   const previousPrimary=(previous?.data as any)?.coreResult?.primaryCategory??null;
 
   const data=await generateServerDailyDestinyData({
