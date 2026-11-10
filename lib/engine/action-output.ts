@@ -36,7 +36,7 @@ export function validateActionSafety(output:ActionOutput,level:1|2|3){
   if(level===2&&(output.estimated_minutes<30||output.estimated_minutes>60)){
     reasons.push('LEVEL_DURATION_MISMATCH');
   }
-  if(level===3&&(output.estimated_minutes<60||output.estimated_minutes>360)){
+  if(level===3&&(output.estimated_minutes<5||output.estimated_minutes>60)){
     reasons.push('LEVEL_DURATION_MISMATCH');
   }
 
