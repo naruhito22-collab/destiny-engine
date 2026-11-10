@@ -70,3 +70,15 @@ button.ghost { background:transparent; color:#aaa; padding:6px 0; margin:0; }
 .shell > h1{margin-top:22px}
 .about-link{margin-top:12px}
 @media(max-width:600px){.shell > .eyebrow{font-size:14px;letter-spacing:.2em}}
+
+.oracle-result{margin-top:12px;padding:28px;border-radius:16px;background:linear-gradient(150deg,#24201b,#141312 65%);border:1px solid #484034;gap:18px}
+.oracle-result .muted{margin:0;color:#d6bd97;opacity:.9}
+.oracle-result h2{font-size:clamp(22px,3vw,30px);line-height:1.5}
+.oracle-reading{font-size:clamp(17px,2.5vw,20px);line-height:2;margin:0;white-space:pre-wrap}
+.oracle-suggestion{border-top:1px solid #51483b;padding-top:20px;line-height:1.8}
+.oracle-suggestion strong{color:#e4cba4;font-size:13px}
+.oracle-suggestion p{margin:10px 0 0}
+.oracle-basis{font-size:13px;line-height:1.8;color:#aaa}
+.oracle-basis summary{cursor:pointer;color:#cdb998}
+.oracle-basis p{white-space:pre-wrap}
+@media(max-width:600px){.oracle-result{padding:22px}}
