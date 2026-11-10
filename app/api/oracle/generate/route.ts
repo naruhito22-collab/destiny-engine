@@ -19,7 +19,17 @@ export async function POST(request:Request){
     const {data:existing,error:existingError}=await supabase.from('oracle_results').select('*')
       .eq('user_id',user.id).eq('daily_destiny_id',daily.id).eq('theme',body.theme).maybeSingle();
     if(existingError)throw existingError;
-    if(existing)return NextResponse.json({oracle:existing,reused:true});
+    if(existing){
+      if(existing.result?.calculationVersion==='oracle-rules-v3'){
+        return NextResponse.json({oracle:existing,reused:true});
+      }
+      // Preserve the existing row identity and audit timestamp; replace only its obsolete interpretation.
+      const updatedResult=buildOracleReading(daily.data as DailyDestinyData,body.theme as OracleTheme);
+      const {data:updated,error:updateError}=await supabase.from('oracle_results')
+        .update({result:updatedResult}).eq('id',existing.id).eq('user_id',user.id).select('*').single();
+      if(updateError)throw updateError;
+      return NextResponse.json({oracle:updated,reused:false,upgraded:true});
+    }
     const result=buildOracleReading(daily.data as DailyDestinyData,body.theme as OracleTheme);
     const {data:created,error:insertError}=await supabase.from('oracle_results').insert({
       user_id:user.id,daily_destiny_id:daily.id,theme:body.theme,result,
