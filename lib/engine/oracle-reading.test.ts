@@ -44,3 +44,41 @@ test('missing divination evidence is not invented',()=>{
 test('missing core category is rejected',()=>{
   assert.throws(()=>buildOracleReading({...fixture,coreResult:undefined},'general'),/ORACLE_CORE_CATEGORY_MISSING/);
 });
+
+test('changing the CORE signal changes the reading in every theme',()=>{
+  const alternate={...fixture,coreResult:{...fixture.coreResult,primaryCategory:'organization' as const}};
+  for(const theme of ORACLE_THEMES){
+    const original=buildOracleReading(fixture,theme);
+    const changed=buildOracleReading(alternate,theme);
+    assert.notEqual(original.reading,changed.reading,theme);
+    assert.notEqual(original.suggestion,changed.suggestion,theme);
+    assert.match(changed.basis,/CORE: 整理/);
+  }
+});
+
+test('theme-specific reading does not present another theme as its main focus',()=>{
+  const expectations={
+    general:/一日の流れと優先順位/,
+    love:/親密さ・気持ちの伝達/,
+    work:/仕事の判断・段取り/,
+    money:/支出・予算/,
+    relationships:/周囲との協力・対話/,
+    health:/休息・生活リズム/,
+    creation:/着想・試作/,
+  } as const;
+  for(const theme of ORACLE_THEMES){
+    const reading=buildOracleReading(fixture,theme).reading;
+    assert.match(reading,expectations[theme],theme);
+    assert.ok(reading.length>100,theme);
+  }
+});
+
+test('optional evidence stays in basis, not invented in the main interpretation',()=>{
+  const sparse={...fixture,numerology:{},iching:{},tarot:{},astrology:{},nineStarKi:{},rokuyo:{}};
+  for(const theme of ORACLE_THEMES){
+    const r=buildOracleReading(sparse,theme);
+    assert.doesNotMatch(r.reading,/パーソナルデー|風地観|The Star|西洋占星術/);
+    assert.doesNotMatch(r.basis,/数秘術:|易:|タロット:|西洋占星術:|九星気学:|六曜:/);
+    assert.equal(r.calculationVersion,'oracle-rules-v4');
+  }
+});
