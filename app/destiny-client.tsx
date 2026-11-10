@@ -29,6 +29,8 @@ export default function DestinyClient(){
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
   const [activeDate,setActiveDate]=useState(todayLocal);
+  const [profileOpen,setProfileOpen]=useState(false);
+  const [evidenceOpen,setEvidenceOpen]=useState(false);
 
   useEffect(()=>{
     const supabase=getSupabaseBrowserClient();
@@ -133,7 +135,7 @@ export default function DestinyClient(){
         setDaily(null);setAction(null);setOracle(null);
       }
       if(!active){
-        const r=await fetch('/api/daily/create',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({local_date:todayLocal()})});
+        const r=await fetch('/api/daily/create',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({local_date:activeDate})});
         const j=await r.json();if(!r.ok)throw new Error(j.error||'DAILY_CREATION_FAILED');
         active=j.daily;setDaily(active);
       }
@@ -161,27 +163,30 @@ export default function DestinyClient(){
   }
 
   return <div className="stack">
-    <section className="card stack">
-      <div className="row between"><p className="muted">PROFILE</p><button className="ghost" onClick={signOut}>ログアウト</button></div>
+    <section className="card profile-card stack">
+      <div className="row between"><div><p className="muted">PROFILE</p><p className="meta">生年月日・行動レベルの設定</p></div><button className="ghost" onClick={()=>setProfileOpen(v=>!v)} aria-expanded={profileOpen}>{profileOpen?"閉じる":"設定を変更 ＋"}</button></div>
+      {profileOpen&&<>
       <label>生年月日<input type="date" value={birthDate} onChange={e=>setBirthDate(e.target.value)} /></label>
       <label>行動レベル<select value={level} onChange={e=>setLevel(Number(e.target.value) as 1|2|3)}><option value={1}>Level 1｜5〜15分</option><option value={2}>Level 2｜30〜60分</option><option value={3}>Level 3｜1〜6時間</option></select></label>
-      <button className="secondary" onClick={saveProfile} disabled={busy||!birthDate}>設定を保存</button>
+      <button className="secondary" onClick={saveProfile} disabled={busy||!birthDate}>設定を保存</button><button className="ghost" onClick={signOut}>ログアウト</button></>}
     </section>
 
     <section className="card hero-card stack">
-      <p className="muted">ACTION｜運命行動</p>
+      <div className="row between"><p className="muted">01 / ACTION</p><span className="date-tag">{activeDate.replaceAll("-",".")}</span></div>
+      <h2 className="section-heading">今日の一手</h2>
       {action ? <>
         <p className="action-text">{action.action_text}</p>
         <p className="meta">Level {action.level}{action.generation_meta?.estimated_minutes?` · 約${action.generation_meta.estimated_minutes}分`:''}</p>
       </> : <h2>まだ今日の運命は演算されていません。</h2>}
-      <button onClick={calculate} disabled={busy||!birthDate}>{busy?'演算中…':'今日の運命を演算する'}</button>
+      <button onClick={calculate} disabled={busy||!birthDate}>{busy?'演算中…':action?'今日の一手を確認する':'今日の運命を演算する'}</button>
       {message&&<p className="status">{message}</p>}
     </section>
 
     {action?.generation_meta&&<section className="card stack">
-      <p className="muted">WHY｜今日の一手の根拠</p>
+      <div className="row between"><p className="muted">02 / WHY</p><button className="ghost" onClick={()=>setEvidenceOpen(v=>!v)} aria-expanded={evidenceOpen}>{evidenceOpen?"詳細を閉じる −":"6占術の内訳 ＋"}</button></div>
+      <h2 className="section-heading">なぜ、この一手なのか</h2>
       {action.generation_meta.short_reason&&<p>{action.generation_meta.short_reason}</p>}
-      {daily?.data&&<div className="evidence-grid">
+      {evidenceOpen&&daily?.data&&<div className="evidence-grid">
         <p>西洋占星術：{categoryLabel(daily.data.astrology?.primaryCategory)}（出生時刻不明・月の出生位置を除外）</p>
         <p>数秘術：{daily.data.numerology?.actionType||'詳細未取得'}</p>
         <p>易：{daily.data.iching?.primaryPosture||'詳細未取得'}</p>
@@ -193,8 +198,8 @@ export default function DestinyClient(){
     </section>}
 
     <section className="card stack">
-      <p className="muted">ORACLE｜テーマ別占い</p>
-      <h2>今日の運命をテーマから読む</h2>
+      <p className="muted">03 / ORACLE</p>
+      <h2 className="section-heading">運命を、もう少し深く。</h2>
       <label>テーマ<select value={oracleTheme} onChange={e=>{setOracle(null);setOracleTheme(e.target.value)}}>
         <option value="general">総合</option><option value="love">恋愛</option><option value="work">仕事</option><option value="money">お金</option><option value="relationships">人間関係</option><option value="health">健康</option><option value="creation">創作</option>
       </select></label>
