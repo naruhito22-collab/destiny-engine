@@ -28,6 +28,7 @@ export default function DestinyClient(){
   const [oracle,setOracle]=useState<any>(null);
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
+  const [activeDate,setActiveDate]=useState(todayLocal);
 
   useEffect(()=>{
     const supabase=getSupabaseBrowserClient();
@@ -37,11 +38,23 @@ export default function DestinyClient(){
   },[]);
 
   useEffect(()=>{
+    const check=()=>{const next=todayLocal();setActiveDate(previous=>previous===next?previous:next);};
+    const timer=window.setInterval(check,15000);
+    window.addEventListener('focus',check);
+    document.addEventListener('visibilitychange',check);
+    return ()=>{window.clearInterval(timer);window.removeEventListener('focus',check);document.removeEventListener('visibilitychange',check);};
+  },[]);
+
+  useEffect(()=>{
+    setDaily(null);setAction(null);setOracle(null);
+  },[activeDate,loggedIn]);
+
+  useEffect(()=>{
     if(!loggedIn) return;
     let cancelled=false;
     async function restoreToday(){
       try{
-        const r=await fetch(`/api/daily?date=${todayLocal()}`,{cache:'no-store'});
+        const r=await fetch(`/api/daily?date=${activeDate}`,{cache:'no-store'});
         if(!r.ok)return;
         const j=await r.json();
         if(cancelled||!j.daily)return;
@@ -52,7 +65,7 @@ export default function DestinyClient(){
     }
     restoreToday();
     return ()=>{cancelled=true;};
-  },[loggedIn]);
+  },[loggedIn,activeDate]);
 
   useEffect(()=>{
     if(!loggedIn) return;
@@ -96,7 +109,7 @@ export default function DestinyClient(){
   async function calculate(){
     setBusy(true); setMessage('運命を演算しています…'); setAction(null);
     try{
-      const dres=await fetch('/api/daily/create',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({local_date:todayLocal()})});
+      const dres=await fetch('/api/daily/create',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({local_date:activeDate})});
       const dj=await dres.json();
       if(!dres.ok) throw new Error(dj.error||'DAILY_CREATION_FAILED');
       setDaily(dj.daily);
@@ -115,7 +128,7 @@ export default function DestinyClient(){
     setBusy(true);setMessage('ORACLEを演算しています…');
     try{
       let active=daily;
-      if(active?.data?.identity?.localDate!==todayLocal()){
+      if(active?.data?.identity?.localDate!==activeDate){
         active=null;
         setDaily(null);setAction(null);setOracle(null);
       }
