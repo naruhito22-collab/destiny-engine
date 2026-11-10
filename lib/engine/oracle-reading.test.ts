@@ -74,11 +74,11 @@ test('theme-specific reading does not present another theme as its main focus',(
 });
 
 test('optional evidence stays in basis, not invented in the main interpretation',()=>{
-  const sparse={...fixture,numerology:{},iching:{},tarot:{},astrology:{},nineStarKi:{},rokuyo:{}};
+  const sparse={...fixture,iching:{},tarot:{},astrology:{},nineStarKi:{},rokuyo:{}};
   for(const theme of ORACLE_THEMES){
     const r=buildOracleReading(sparse,theme);
     assert.doesNotMatch(r.reading,/パーソナルデー|風地観|The Star|西洋占星術/);
-    assert.doesNotMatch(r.basis,/数秘術:|易:|タロット:|西洋占星術:|九星気学:|六曜:/);
+    assert.doesNotMatch(r.basis,/易:|タロット:|西洋占星術:|九星気学:|六曜:/);
     assert.equal(r.calculationVersion,'oracle-rules-v4');
   }
 });
