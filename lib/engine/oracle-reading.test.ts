@@ -23,7 +23,7 @@ test('all seven ORACLE themes have individual suggestions with verified evidence
     assert.match(r.basis,/The Star/);
     assert.match(r.basis,/数秘術: 3/);
     assert.match(r.basis,/九星気学: 北/);
-    assert.equal(r.calculationVersion,'oracle-rules-v5');
+    assert.equal(r.calculationVersion,'oracle-rules-v6');
     assert.doesNotMatch(r.reading,/架空/);
   }
   assert.equal(suggestions.size,7);
@@ -70,6 +70,12 @@ test('optional evidence stays in basis, not invented in the main interpretation'
     const r=buildOracleReading(sparse,theme);
     assert.doesNotMatch(r.reading,/パーソナルデー|風地観|The Star|西洋占星術/);
     assert.doesNotMatch(r.basis,/易:|タロット:|西洋占星術:|九星気学:|六曜:/);
-    assert.equal(r.calculationVersion,'oracle-rules-v5');
+    assert.equal(r.calculationVersion,'oracle-rules-v6');
   }
+});
+
+test('different domains never share the same guidance for the same posture',()=>{
+  const readings=ORACLE_THEMES.map(theme=>buildOracleReading(fixture,theme));
+  assert.equal(new Set(readings.map(r=>r.reading.split('。')[1])).size,7);
+  for(const r of readings)assert.doesNotMatch(r.suggestion,/六曜|テンポ補正/);
 });
