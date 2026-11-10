@@ -20,7 +20,7 @@ export async function POST(request:Request){
       .eq('user_id',user.id).eq('daily_destiny_id',daily.id).eq('theme',body.theme).maybeSingle();
     if(existingError)throw existingError;
     if(existing){
-      if(existing.result?.calculationVersion==='oracle-rules-v5'){
+      if(existing.result?.calculationVersion==='oracle-rules-v6'){
         return NextResponse.json({oracle:existing,reused:true});
       }
       // Preserve the existing row identity and audit timestamp; replace only its obsolete interpretation.
