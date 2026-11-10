@@ -12,12 +12,13 @@ export async function getProfile(userId:string){
   return data;
 }
 
-export async function getPreviousDailyDestiny(userId:string,beforeDate:string){
+export async function getPreviousDailyDestiny(userId:string,beforeDate:string,engineVersion:string){
   const supabase=await createSupabaseServerClient();
   const {data,error}=await supabase.from('daily_destiny')
     .select('id,local_date,data')
     .eq('user_id',userId)
     .lt('local_date',beforeDate)
+    .eq('engine_version',engineVersion)
     .order('local_date',{ascending:false})
     .limit(1)
     .maybeSingle();
