@@ -50,3 +50,17 @@ button.ghost { background:transparent; color:#aaa; padding:6px 0; margin:0; }
 }
 
 .about-link{display:inline-flex;align-items:center;gap:12px;color:#e6d8bc;text-decoration:none;border-bottom:1px solid #6c614f;padding-bottom:9px;margin:-22px 0 38px;font-size:14px}.about-link span{font-size:11px;opacity:.55}.about-link:hover,.about-back:hover{color:#fff}.about-shell{max-width:900px}.about-shell h1{font-size:clamp(38px,6vw,64px);line-height:1.18}.about-shell .card p{line-height:1.9}.about-shell .card h2{font-size:22px}.about-methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:20px 0}.about-method{display:flex;flex-direction:column;gap:10px}.about-method h2{margin:0}.about-method p{margin:0}.about-method-top{display:flex;justify-content:space-between;align-items:center}.about-number{font-size:28px;color:#d6c3a1;font-weight:300}.about-role{font-size:11px;letter-spacing:.1em;border:1px solid #555;border-radius:20px;padding:5px 12px;color:#d6c3a1}.about-back{display:inline-block;margin-top:34px;color:#d6c3a1;text-decoration:none}@media(max-width:600px){.about-methods{grid-template-columns:1fr}}
+
+/* Daily reading: editorial hierarchy */
+.profile-card{background:#0d0d0d;padding:20px 28px;border-color:#252525}
+.profile-card .muted{margin:0 0 7px}
+.hero-card{background:radial-gradient(ellipse at 90% 0%,#29231c 0%,#151413 38%,#101010 80%);border-color:#484036;padding:40px 36px 36px;gap:22px}
+.hero-card .section-heading{font-size:clamp(24px,4vw,34px);font-weight:500;letter-spacing:-.035em}
+.hero-card .action-text{font-size:clamp(25px,4.3vw,39px);line-height:1.65;letter-spacing:-.035em;margin:8px 0 4px}
+.hero-card button{background:#e9d7b9;color:#211c17;font-weight:600}
+.date-tag{font-size:12px;color:#b7a58c;letter-spacing:.1em}
+.section-heading{font-size:clamp(21px,3vw,27px)!important;letter-spacing:-.02em}
+.evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.evidence-grid p{margin:0;padding:13px 14px;border:1px solid #303030;border-radius:10px;font-size:13px;line-height:1.7;color:#d8d8d8}
+.profile-card .ghost{color:#cdb998}
+@media(max-width:600px){.hero-card{padding:30px 22px}.evidence-grid{grid-template-columns:1fr}.profile-card{padding:18px 20px}}
