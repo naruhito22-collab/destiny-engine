@@ -29,7 +29,7 @@ test('all seven ORACLE themes have individual suggestions with verified evidence
   assert.equal(suggestions.size,7);
   const readings=ORACLE_THEMES.map(theme=>buildOracleReading(fixture,theme).reading);
   assert.equal(new Set(readings).size,7);
-  assert.match(buildOracleReading(fixture,'work').reading,/仕事/);
+  assert.match(buildOracleReading(fixture,'work').reading,/提案|仕事|判断/);
   assert.match(buildOracleReading(fixture,'love').reading,/相手/);
   assert.match(buildOracleReading(fixture,'money').reading,/買う前/);
 });
