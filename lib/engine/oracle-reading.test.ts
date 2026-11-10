@@ -23,7 +23,7 @@ test('all seven ORACLE themes have individual suggestions with verified evidence
     assert.match(r.basis,/The Star/);
     assert.match(r.basis,/数秘術: 3/);
     assert.match(r.basis,/九星気学: 北/);
-    assert.equal(r.calculationVersion,'oracle-rules-v3');
+    assert.equal(r.calculationVersion,'oracle-rules-v4');
     assert.doesNotMatch(r.reading,/架空/);
   }
   assert.equal(suggestions.size,7);
