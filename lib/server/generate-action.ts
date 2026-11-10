@@ -32,7 +32,7 @@ export async function generateActionWithOpenAI(input:GenerateActionInput){
 
   const instructions=[
     'あなたはDESTINY ENGINEのACTION具体化器。占術計算を変更してはいけない。',
-    '具体的な行動を1件だけ生成する。抽象的助言や複数案は禁止。',
+    '今日の24時間の中で実行できる具体的な行動を1件だけ生成する。24時間連続の作業は要求しない。抽象的助言や複数案は禁止。',
     '重大な人生判断、高額支出、投資、借金、ギャンブル、退職、契約、結婚離婚、医療判断、危険行為は禁止。',
     '指定patternを必ず維持する。九星方位と六曜は自然に使える場合だけ反映する。',
     'risk_flagsは安全上の懸念がなければ空配列。',
