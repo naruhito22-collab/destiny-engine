@@ -30,6 +30,7 @@ export default function DestinyClient(){
   const [activeDate,setActiveDate]=useState(todayLocal);
   const [profileOpen,setProfileOpen]=useState(false);
   const [evidenceOpen,setEvidenceOpen]=useState(false);
+  const [oracleHistory,setOracleHistory]=useState<Record<string,any>>({});
 
   useEffect(()=>{
     const supabase=getSupabaseBrowserClient();
@@ -47,7 +48,7 @@ export default function DestinyClient(){
   },[]);
 
   useEffect(()=>{
-    setDaily(null);setAction(null);setOracle(null);
+    setDaily(null);setAction(null);setOracle(null);setOracleHistory({});
   },[activeDate,loggedIn]);
 
   useEffect(()=>{
@@ -113,7 +114,7 @@ export default function DestinyClient(){
       const dj=await dres.json();
       if(!dres.ok) throw new Error(dj.error||'DAILY_CREATION_FAILED');
       setDaily(dj.daily);
-      setOracle(null);
+      setOracle(null);setOracleHistory({});
 
       const ares=await fetch('/api/action/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({daily_destiny_id:dj.daily.id,level:3})});
       const aj=await ares.json();
@@ -140,7 +141,7 @@ export default function DestinyClient(){
       if(!active)throw new Error('DAILY_DESTINY_NOT_FOUND');
       const r=await fetch('/api/oracle/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({daily_destiny_id:active.id,theme:oracleTheme})});
       const j=await r.json();if(!r.ok)throw new Error(j.error||'ORACLE_FAILED');
-      setOracle(j.oracle);setMessage(j.reused?'今日のORACLEを読み込みました。':'ORACLEを演算しました。');
+      setOracle(j.oracle);setOracleHistory(previous=>({...previous,[oracleTheme]:j.oracle}));setMessage(j.reused?'今日のORACLEを読み込みました。':'ORACLEを演算しました。');
     }catch(e:any){setMessage(e.message||'ORACLEの演算に失敗しました。');}
     finally{setBusy(false);}
   }
@@ -174,7 +175,7 @@ export default function DestinyClient(){
       {action ? <>
         <p className="action-text">{action.action_text}</p>
       </> : <h2>まだ今日の運命は演算されていません。</h2>}
-      <button onClick={calculate} disabled={busy||!birthDate}>{busy?'演算中…':action?'今日の一手を確認する':'今日の運命を演算する'}</button>
+      {!action&&<button onClick={calculate} disabled={busy||!birthDate}>{busy?'演算中…':'今日の運命を演算する'}</button>}
       {message&&<p className="status">{message}</p>}
     </section>
 
@@ -194,11 +195,11 @@ export default function DestinyClient(){
 
     <section className="card stack">
       <h2 className="section-heading">運命を、もう少し深く。</h2>
-      <label>テーマ<select value={oracleTheme} onChange={e=>{setOracle(null);setOracleTheme(e.target.value)}}>
+      <label>テーマ<select value={oracleTheme} onChange={e=>{setOracle(oracleHistory[e.target.value]||null);setOracleTheme(e.target.value)}}>
         <option value="general">総合</option><option value="love">恋愛</option><option value="work">仕事</option><option value="money">お金</option><option value="relationships">人間関係</option><option value="health">健康</option><option value="creation">創作</option>
       </select></label>
       <button onClick={consultOracle} disabled={busy||!birthDate}>{busy?'演算中…':'ORACLEを占う'}</button>
-      {oracle?.result&&<div className="stack"><h2>{oracle.result.title}</h2><p>{oracle.result.reading}</p><p><strong>今日のヒント：</strong>{oracle.result.suggestion}</p><p className="meta">{oracle.result.basis}</p><p className="meta">{oracle.result.disclaimer}</p></div>}
+      {oracle?.result&&<div className="oracle-result stack"><p className="muted">TODAY'S ORACLE</p><h2>{oracle.result.title}</h2><p className="oracle-reading">{oracle.result.reading}</p><div className="oracle-suggestion"><strong>今日のヒント</strong><p>{oracle.result.suggestion}</p></div><details className="oracle-basis"><summary>占術の根拠・注意事項</summary><p>{oracle.result.basis}</p><p>{oracle.result.disclaimer}</p></details></div>}
     </section>
 
     {daily&&<section className="details">
