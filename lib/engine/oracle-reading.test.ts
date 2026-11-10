@@ -23,15 +23,15 @@ test('all seven ORACLE themes have individual suggestions with verified evidence
     assert.match(r.basis,/The Star/);
     assert.match(r.basis,/数秘術: 3/);
     assert.match(r.basis,/九星気学: 北/);
-    assert.equal(r.calculationVersion,'oracle-rules-v4');
+    assert.equal(r.calculationVersion,'oracle-rules-v5');
     assert.doesNotMatch(r.reading,/架空/);
   }
   assert.equal(suggestions.size,7);
   const readings=ORACLE_THEMES.map(theme=>buildOracleReading(fixture,theme).reading);
   assert.equal(new Set(readings).size,7);
-  assert.match(buildOracleReading(fixture,'work').reading,/仕事の意思決定|仕事の進め方/);
-  assert.match(buildOracleReading(fixture,'love').reading,/相手との関係|恋愛/);
-  assert.match(buildOracleReading(fixture,'money').reading,/支出や予算/);
+  assert.match(buildOracleReading(fixture,'work').reading,/仕事/);
+  assert.match(buildOracleReading(fixture,'love').reading,/相手/);
+  assert.match(buildOracleReading(fixture,'money').reading,/買う前/);
 });
 
 test('missing divination evidence is not invented',()=>{
@@ -56,20 +56,11 @@ test('changing the CORE signal changes the reading in every theme',()=>{
   }
 });
 
-test('theme-specific reading does not present another theme as its main focus',()=>{
-  const expectations={
-    general:/一日の流れと優先順位/,
-    love:/親密さ・気持ちの伝達/,
-    work:/仕事の判断・段取り/,
-    money:/支出・予算/,
-    relationships:/周囲との協力・対話/,
-    health:/休息・生活リズム/,
-    creation:/着想・試作/,
-  } as const;
+test('readings stay short and avoid technical terms',()=>{
   for(const theme of ORACLE_THEMES){
     const reading=buildOracleReading(fixture,theme).reading;
-    assert.match(reading,expectations[theme],theme);
-    assert.ok(reading.length>100,theme);
+    assert.ok(reading.length<120,theme);
+    assert.doesNotMatch(reading,/易の|数秘術|タロット|補助線|焦点は/);
   }
 });
 
@@ -79,6 +70,6 @@ test('optional evidence stays in basis, not invented in the main interpretation'
     const r=buildOracleReading(sparse,theme);
     assert.doesNotMatch(r.reading,/パーソナルデー|風地観|The Star|西洋占星術/);
     assert.doesNotMatch(r.basis,/易:|タロット:|西洋占星術:|九星気学:|六曜:/);
-    assert.equal(r.calculationVersion,'oracle-rules-v4');
+    assert.equal(r.calculationVersion,'oracle-rules-v5');
   }
 });
