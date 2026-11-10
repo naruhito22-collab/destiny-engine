@@ -7,6 +7,7 @@ import { requireServerEnv } from './env';
 import { getPreviousDailyDestiny, getProfile, insertDailyDestinyOnce } from './daily-repository';
 
 export const ENGINE_VERSION='0.2.0';
+export const engineVersionForBirthDate=(birthDate:string)=>`${ENGINE_VERSION}-birth-${birthDate}`;
 
 export async function createDailyDestinyForUser(args:{userId:string;localDate:string}){
   const profile=await getProfile(args.userId);
@@ -15,6 +16,7 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
   }
 
   const timezone=profile.timezone||'Asia/Tokyo';
+  const engineVersion=engineVersionForBirthDate(profile.birth_date);
   // Birth location and time are unknown. Use a fixed UTC noon reference,
   // never the user's current timezone as a proxy for their birthplace.
   // Time-sensitive natal factors must be excluded by the astrology engine.
@@ -24,14 +26,14 @@ export async function createDailyDestinyForUser(args:{userId:string;localDate:st
   const birthYear=Number(profile.birth_date.slice(0,4));
   const risshun=findSolarTerm(birthYear,'RISSHUN',timezone);
   const solstices=solsticePairForDate(args.localDate,timezone);
-  const previous=await getPreviousDailyDestiny(args.userId,args.localDate,ENGINE_VERSION);
+  const previous=await getPreviousDailyDestiny(args.userId,args.localDate,engineVersion);
   const previousPrimary=(previous?.data as any)?.coreResult?.primaryCategory??null;
 
   const data=await generateServerDailyDestinyData({
     userId:args.userId,
     localDate:args.localDate,
     timezone,
-    engineVersion:ENGINE_VERSION,
+    engineVersion,
     seedSalt:requireServerEnv('DESTINY_SEED_SALT'),
     birthDate:profile.birth_date,
     birthTimeAvailable:false,
