@@ -102,7 +102,8 @@ export default function DestinyClient(){
       })});
       const j=await r.json();
       if(!r.ok) throw new Error(j.error||'PROFILE_SAVE_FAILED');
-      setMessage('プロフィールを保存しました。');
+      setDaily(null);setAction(null);setOracle(null);setOracleHistory({});
+      setMessage('生年月日を保存しました。新しい生年月日で「今日の運命を演算する」を押してください。');
     }catch(e:any){ setMessage(e.message||'保存に失敗しました。'); }
     finally{ setBusy(false); }
   }
